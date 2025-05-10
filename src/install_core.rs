@@ -1,23 +1,7 @@
-use std::{str,fs,process::Command};
 mod global;
-use crate::global::Config;
-use crate::global::read_config;
+use crate::global::*;
 
-fn main() {
-    let cmd: String;
-    match std::env::args().nth(1) {
-        Some(v) => cmd = v,
-        None    => { println!("ERROR: unexpected argument for command field."); return; },
-    }
-
-    match cmd.as_str() {
-        "install-core" => install_core(),
-        //"build-core"   => build_core(),
-        _              => println!("ERROR: unexpected argument for command field."),
-    }
-}
-
-fn install_core() {
+pub fn install_core() {
     let config: Config = read_config();
     println!("removing old fe-core...");
     let _rm_old_core = Command::new("rm")
