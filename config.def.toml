@@ -1,0 +1,4 @@
+[cmds]
+shell_cmd = ["bash", "-c"]
+install_core = "git clone https://github.com/shawarmateam/cfiles-engine fe-core"
+
