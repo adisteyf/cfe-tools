@@ -1,7 +1,11 @@
 use std::{str,fs,process::Command};
 mod global;
+mod install_core;
+mod build_core;
 use crate::global::Config;
 use crate::global::read_config;
+use crate::install_core::install_core;
+use crate::build_core::build_core;
 
 fn main() {
     let cmd: String;
@@ -12,41 +16,8 @@ fn main() {
 
     match cmd.as_str() {
         "install-core" => install_core(),
-        //"build-core"   => build_core(),
+        "build-core"   => build_core(),
         _              => println!("ERROR: unexpected argument for command field."),
     }
 }
 
-fn install_core() {
-    let config: Config = read_config();
-    println!("removing old fe-core...");
-    let _rm_old_core = Command::new("rm")
-        .args(["-rf", "fe-core"])
-        .output()
-        .expect("cmd err");
-    println!("installing fe-core...");
-
-    if config.cmds.shell_cmd.len() == 0 || config.cmds.install_core.len() == 0 {
-        panic!("ERROR: no commands in config.toml");
-    }
-
-    if config.cmds.shell_cmd.len() == 1 {
-        let _install_core = Command::new(config.cmds.shell_cmd[0].clone())
-            .args([config.cmds.install_core])
-            .output()
-            .expect("cmd err");
-    }
-
-    else {
-        let mut args = config.cmds.shell_cmd.clone();
-        args.remove(0);
-        args.push(config.cmds.install_core);
-
-        let _install_core = Command::new(config.cmds.shell_cmd[0].clone())
-            .args(args)
-            .output()
-            .expect("cmd err");
-    }
-
-    println!("successfully installed core");
-}
