@@ -4,12 +4,18 @@ use std::fs;
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub cmds: Cmds,
+    pub scripts: Scripts,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Cmds {
     pub shell_cmd: Vec<String>,
     pub install_core: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Scripts {
+    pub list: Vec<String>,
 }
 
 pub fn read_config() -> Config {

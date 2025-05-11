@@ -1,5 +1,5 @@
-mod global;
 use crate::global::*;
+use std::process::Command;
 
 pub fn install_core() {
     let config: Config = read_config();
