@@ -49,8 +49,6 @@ fn build_code() {
 }
 
 pub fn build_core() {
-    build_code();
-    return;
     let config: Config = read_config();
 
     println!("removing old fe-core scripts...");
@@ -71,5 +69,6 @@ pub fn build_core() {
         .output()
         .expect("cmd err");
 
+    build_code();
     println!("done!");
 }
