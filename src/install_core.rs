@@ -19,9 +19,7 @@ pub fn install_core() {
             .args([config.cmds.install_core])
             .output()
             .expect("cmd err");
-    }
-
-    else {
+    } else {
         let mut args = config.cmds.shell_cmd.clone();
         args.remove(0);
         args.push(config.cmds.install_core);

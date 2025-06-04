@@ -19,8 +19,7 @@ pub struct Scripts {
 }
 
 pub fn read_config() -> Config {
-    let file = fs::read_to_string("config.toml")
-        .expect("ERROR: Can't read config.toml");
+    let file = fs::read_to_string("config.toml").expect("ERROR: Can't read config.toml");
     let config: Config = toml::from_str(&file).unwrap();
     return config;
 }
