@@ -1,30 +1,33 @@
 use crate::global::*;
-use std::process::Command;
-use std::process;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
+use std::process;
+use std::process::Command;
 
 fn build_code() {
     let mut core_build_path = match env::current_dir() {
-        Ok(p)  => {
-            let mut p=p;
+        Ok(p) => {
+            let mut p = p;
             p.push("fe-core");
             p.push("build");
             p
-        },
+        }
         Err(e) => {
             panic!("ERROR,build_code: Can't get current path.");
-        },
+        }
     };
 
     /*if !core_build_path.is_dir() {
         panic!("ERROR: Can't get fe-core folder.");
     }*/
 
-    println!("Path to fe-core build folder: {}", core_build_path.to_str().unwrap());
+    println!(
+        "Path to fe-core build folder: {}",
+        core_build_path.to_str().unwrap()
+    );
     match fs::create_dir_all(&core_build_path) {
-        Ok(_)  => println!("Created 'build' dir"),
+        Ok(_) => println!("Created 'build' dir"),
         Err(e) => panic!("ERROR: Can't create the folder."),
     }
 
@@ -57,7 +60,9 @@ pub fn build_core() {
         .output()
         .expect("cmd err");
 
-    let quoted_list: Vec<String> = config.scripts.list
+    let quoted_list: Vec<String> = config
+        .scripts
+        .list
         .iter()
         .map(|s| format!("'{}'", s))
         .collect();
