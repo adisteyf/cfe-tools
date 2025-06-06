@@ -9,8 +9,7 @@ pub struct Config {
 
 #[derive(Debug, Deserialize)]
 pub struct Cmds {
-    pub shell_cmd: Vec<String>,
-    pub install_core: String,
+    pub install_core: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
