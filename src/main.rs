@@ -4,6 +4,7 @@ mod build_core;
 mod global;
 mod help;
 mod install_core;
+mod utils;
 use crate::build_core::build_core;
 use crate::global::Config;
 use crate::global::read_config;
