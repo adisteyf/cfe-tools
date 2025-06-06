@@ -1,16 +1,17 @@
 #![allow(unused_imports)]
 use std::{fs, process::Command, str};
 mod build_core;
+mod build_remove;
 mod global;
 mod help;
 mod install_core;
 mod utils;
 use crate::build_core::build_core;
+use crate::build_remove::*;
 use crate::global::Config;
 use crate::global::read_config;
 use crate::help::{print_help, print_version};
 use crate::install_core::install_core;
-use crate::utils::rm_build;
 
 fn main() {
     let cmd: String;
@@ -25,7 +26,7 @@ fn main() {
     match cmd.as_str() {
         "install-core" => install_core(),
         "build-core" => build_core(),
-        "build-remove" => rm_build(),
+        "build-remove" => build_remove(),
         "--help" => print_help(),
         "-h" => print_help(),
         "--version" => print_version(),

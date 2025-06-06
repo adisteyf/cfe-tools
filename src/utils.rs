@@ -1,37 +1,42 @@
 use crate::global::*;
 use crate::utils::string::FromUtf8Error;
 use std::path::{self, Path};
-use std::process::{self, Command};
+use std::process::{self, Child, Command, Stdio};
+use std::{env, string, vec};
 use std::{fs, io};
-use std::{string, vec};
 
-pub fn run_cmd(cmd: &[&str]) -> String {
-    let output: String = match cmd.len() {
+pub fn run_cmd(cmd: &[&str]) -> Child {
+    let output: Child = match cmd.len() {
         0 => {
             panic!("ERROR,run_cmd: cmd.len() == 0");
         }
 
         /* if it's the simpliest cmd */
-        1 => String::from_utf8(
-            Command::new(cmd[0])
-                .output()
-                .expect("ERROR,run_cmd: Can't run the command.")
-                .stdout,
-        )
-        .expect("ERROR,run_cmd: Can't get stdout."),
+        1 => Command::new(cmd[0]).stdout(Stdio::piped()).spawn().unwrap(),
 
         /* otherwise */
-        _ => String::from_utf8(
-            Command::new(cmd[0])
-                .args(&cmd[1..])
-                .output()
-                .expect("ERROR,run_cmd: Can't run the command.")
-                .stdout,
-        )
-        .expect("ERROR,run_cmd: Can't get stdout."),
+        _ => Command::new(cmd[0])
+            .args(&cmd[1..])
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap(),
     };
 
     return output;
+}
+
+fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+    fs::create_dir_all(&dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let ty = entry.file_type()?;
+        if ty.is_dir() {
+            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        } else {
+            fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        }
+    }
+    Ok(())
 }
 
 pub fn cp_scripts(config: Config) {
@@ -39,12 +44,22 @@ pub fn cp_scripts(config: Config) {
         .scripts
         .list
         .iter()
-        .map(|s| format!("'{}'", s))
+        .map(|s| String::from(s))
         .collect();
-    let folders_list = quoted_list.join(" ");
 
-    println!("copying new fe-core scripts...");
-    let _cp_new_scripts = run_cmd(&vec!["cp", "-r", folders_list.as_str(), "fe-core"]);
+    for folder in quoted_list {
+        copy_dir_all(&folder, &format!("fe-core/{}", &folder)).unwrap();
+    }
+
+    /*
+        println!("copying new fe-core scripts...");
+        println!(
+            "cfe folders: {}, curr. dir {:#?}",
+            folders_list.as_str(),
+            env::current_dir().unwrap()
+        );
+        //let _cp_new_scripts = run_cmd(&vec!["cp", "-r", folders_list.as_str(), "fe-core"]);
+    */
 }
 
 pub fn rm_scripts() {
@@ -69,7 +84,22 @@ pub fn rm_scripts() {
     }
 }
 
-pub fn rm_build() {
-    let fe_build = Path::new("fe-core/build");
-    fs::remove_dir_all(fe_build).unwrap();
+pub fn rm_dir(folder: &str) {
+    let path = Path::new(folder);
+
+    /* check if folder doesn't exist */
+    if fs::metadata(path).is_err() {
+        panic!("ERROR: This dir doesn't exist");
+    }
+
+    fs::remove_dir_all(path).expect("ERROR: Can't remove dir.");
+}
+
+pub fn mk_dir(folder: &str) {
+    let path = Path::new(folder);
+    fs::create_dir_all(path).unwrap();
+}
+
+pub fn ch_dir(path: &str) {
+    env::set_current_dir(path).expect("ERROR: Can't set current dir.");
 }

@@ -1,11 +1,12 @@
 use crate::global::*;
-use crate::utils::run_cmd;
+use crate::utils::{rm_dir, run_cmd};
 use std::process::Command;
 
 pub fn install_core() {
     let config: Config = read_config();
     println!("removing old fe-core...");
-    let _rm_old_core = run_cmd(&vec!["rm", "-rf", "fe-core"]);
+
+    let _rm_old_core = rm_dir("fe-core");
     println!("installing fe-core...");
 
     if config.cmds.install_core.len() == 0 {
