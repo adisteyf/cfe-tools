@@ -16,10 +16,6 @@ fn build_code() {
         Err(e) => panic!("ERROR,build_code: Can't get current path: {}", e),
     };
 
-    /*if !core_build_path.is_dir() {
-        panic!("ERROR: Can't get fe-core folder.");
-    }*/
-
     println!(
         "Path to fe-core build folder: {}",
         core_build_path.to_str().unwrap()
@@ -45,12 +41,6 @@ pub fn build_core() {
     let config: Config = read_config();
 
     println!("removing old fe-core scripts...");
-    /*
-        let _rm_old_scripts = Command::new("bash")
-            .args(["-c", "rm -rf fe-core/cfe-*"])
-            .output()
-            .expect("cmd err");
-    */
     rm_scripts();
     println!("pasting new scripts...");
     cp_scripts(config);

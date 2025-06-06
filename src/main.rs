@@ -10,6 +10,7 @@ use crate::global::Config;
 use crate::global::read_config;
 use crate::help::{print_help, print_version};
 use crate::install_core::install_core;
+use crate::utils::rm_build;
 
 fn main() {
     let cmd: String;
@@ -24,6 +25,7 @@ fn main() {
     match cmd.as_str() {
         "install-core" => install_core(),
         "build-core" => build_core(),
+        "build-remove" => rm_build(),
         "--help" => print_help(),
         "-h" => print_help(),
         "--version" => print_version(),

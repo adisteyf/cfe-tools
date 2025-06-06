@@ -48,11 +48,6 @@ pub fn cp_scripts(config: Config) {
 }
 
 pub fn rm_scripts() {
-    /*let _rm_old_scripts = Command::new("bash")
-    .args(["-c", "rm -rf fe-core/cfe-*"])
-    .output()
-    .expect("cmd err");*/
-
     let fe_core = Path::new("fe-core");
     for entry in fs::read_dir(fe_core).expect("ERROR,rm_scripts: Can't read fe-core folder.") {
         let entry = entry.unwrap();
@@ -72,4 +67,9 @@ pub fn rm_scripts() {
         fs::remove_dir_all(&path).unwrap();
         println!("INFO: Deleted dir: {:?}", path);
     }
+}
+
+pub fn rm_build() {
+    let fe_build = Path::new("fe-core/build");
+    fs::remove_dir_all(fe_build).unwrap();
 }
