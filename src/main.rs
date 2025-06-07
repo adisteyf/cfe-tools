@@ -12,6 +12,8 @@ use crate::global::Config;
 use crate::global::read_config;
 use crate::help::{print_help, print_version};
 use crate::install_core::install_core;
+use crate::utils::gen_fe_includes;
+use std::env::current_exe;
 
 fn main() {
     let cmd: String;
@@ -27,6 +29,7 @@ fn main() {
         "install-core" => install_core(),
         "build-core" => build_core(),
         "build-remove" => build_remove(),
+        "gen-includes" => println!("{}", gen_fe_includes()),
         "--help" => print_help(),
         "-h" => print_help(),
         "--version" => print_version(),
