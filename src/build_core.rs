@@ -11,6 +11,8 @@ fn build_code() {
     /* configure using cmake */
     println!("Configuring using CMake...");
     ch_dir("fe-core/build");
+
+    println!("current dir: {:?}", env::current_dir().unwrap());
     let _cmake_out = run_cmd(&vec!["cmake", ".."]);
 
     /* build using make */
