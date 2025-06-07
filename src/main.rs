@@ -12,7 +12,7 @@ use crate::global::Config;
 use crate::global::read_config;
 use crate::help::{print_help, print_version};
 use crate::install_core::install_core;
-use crate::utils::gen_fe_includes;
+use crate::utils::{gen_fe_includes, run_core};
 use std::env::current_exe;
 
 fn main() {
@@ -30,6 +30,7 @@ fn main() {
         "build-core" => build_core(),
         "build-remove" => build_remove(),
         "gen-includes" => println!("{}", gen_fe_includes()),
+        "run-core" => run_core(),
         "--help" => print_help(),
         "-h" => print_help(),
         "--version" => print_version(),
