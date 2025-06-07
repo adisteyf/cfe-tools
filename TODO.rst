@@ -7,6 +7,10 @@ Structure of versions -- v1.2.3
 2. Minor version *(some changes)*
 3. Unplanned fixes *(patch)*
 
+v1.6.2
+------
+- ✅ Add **gen_includes()** to **build-core**
+
 v1.6.1
 ------
 

@@ -3,7 +3,10 @@ use crate::utils::string::FromUtf8Error;
 use std::path::{self, Path, PathBuf};
 use std::process::{self, Child, Command, Stdio};
 use std::{env, string, vec};
-use std::{fs, io};
+use std::{
+    fs::{self, File},
+    io::{self, Write},
+};
 
 pub fn run_cmd(cmd: &[&str]) -> Child {
     let mut output: Child = match cmd.len() {
@@ -110,6 +113,20 @@ pub fn rm_dir(folder: &str) {
     fs::remove_dir_all(path).expect("ERROR: Can't remove dir.");
 }
 
+pub fn rmf_file(file: &str) {
+    let path = Path::new(file);
+    if fs::metadata(file).is_err() {
+        return;
+    }
+
+    fs::remove_file(path).unwrap();
+}
+
+pub fn write_to_file(file: &str, text: &str) {
+    let mut fd = File::create(file).unwrap();
+    fd.write_all(text.as_bytes()).unwrap();
+}
+
 pub fn mk_dir(folder: &str) {
     let path = Path::new(folder);
     fs::create_dir_all(path).unwrap();
@@ -123,6 +140,8 @@ pub fn ch_dir(path: &str) {
 pub fn gen_fe_includes() -> String {
     let mut headers_vector: Vec<String> = Vec::new();
 
+    /* cd into core */
+    ch_dir("fe-core");
     for root_entry in fs::read_dir(".").unwrap() {
         let root_entry = root_entry.unwrap();
 
@@ -159,6 +178,9 @@ pub fn gen_fe_includes() -> String {
         let curr_str = format!("#define FE_INCLUDES__\n#include \"{}\"\n", header);
         gen_str.push_str(&curr_str);
     }
+
+    /* turn back */
+    ch_dir("..");
 
     gen_str.push_str("#endif");
     gen_str
