@@ -12,6 +12,7 @@ use crate::global::Config;
 use crate::global::read_config;
 use crate::help::{print_help, print_version};
 use crate::install_core::install_core;
+use std::env::current_exe;
 
 fn main() {
     let cmd: String;

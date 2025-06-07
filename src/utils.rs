@@ -1,27 +1,33 @@
 use crate::global::*;
 use crate::utils::string::FromUtf8Error;
-use std::path::{self, Path};
+use std::path::{self, Path, PathBuf};
 use std::process::{self, Child, Command, Stdio};
 use std::{env, string, vec};
 use std::{fs, io};
 
 pub fn run_cmd(cmd: &[&str]) -> Child {
-    let output: Child = match cmd.len() {
+    let mut output: Child = match cmd.len() {
         0 => {
             panic!("ERROR,run_cmd: cmd.len() == 0");
         }
 
         /* if it's the simpliest cmd */
-        1 => Command::new(cmd[0]).stdout(Stdio::piped()).spawn().unwrap(),
+        1 => Command::new(cmd[0])
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
+            .spawn()
+            .unwrap(),
 
         /* otherwise */
         _ => Command::new(cmd[0])
             .args(&cmd[1..])
-            .stdout(Stdio::piped())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
             .spawn()
             .unwrap(),
     };
 
+    let _res = output.wait();
     return output;
 }
 
@@ -47,7 +53,26 @@ pub fn cp_scripts(config: Config) {
         .map(|s| String::from(s))
         .collect();
 
+    let exec_path = env::current_exe().unwrap();
+    let scripts_path = exec_path.parent().unwrap();
+
     for folder in quoted_list {
+        if fs::metadata(&folder).is_err() {
+            let check_script: PathBuf = scripts_path.join(&folder);
+            println!("check_script: {:#?}", &check_script);
+
+            if fs::metadata(&check_script).is_ok() {
+                copy_dir_all(&check_script, &format!("fe-core/{}", &folder)).unwrap();
+            } else {
+                println!(
+                    "INFO: No '{}' in '.' and in '{:#?}'",
+                    &folder, &scripts_path
+                );
+                panic!("ERROR: Can't find '{}' script", &folder);
+            }
+            continue;
+        }
+
         copy_dir_all(&folder, &format!("fe-core/{}", &folder)).unwrap();
     }
 
