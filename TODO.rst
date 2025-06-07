@@ -13,7 +13,7 @@ None - ⬜️
 v1.6.4
 ------
 
-- ⬜️ Add **export-scripts** command *(from core)*
+- ✅ Add **export-scripts** command *(from core)*
 
 v1.6.3
 ------

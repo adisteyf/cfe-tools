@@ -142,6 +142,20 @@ pub fn run_core() {
     ch_dir("../..");
 }
 
+pub fn export_scripts() {
+    for entry in fs::read_dir("fe-core").unwrap() {
+        let entry = entry.unwrap();
+        let filename = entry.file_name().to_string_lossy().into_owned();
+
+        if !entry.path().is_dir() || !filename.starts_with("cfe-") {
+            continue;
+        }
+
+        mk_dir(&filename);
+        let _ = copy_dir_all(entry.path(), &filename);
+    }
+}
+
 #[allow(unused_variables)]
 pub fn gen_fe_includes() -> String {
     let mut headers_vector: Vec<String> = Vec::new();
