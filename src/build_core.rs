@@ -25,6 +25,12 @@ pub fn build_core() {
     rm_scripts();
     println!("pasting new scripts...");
     cp_scripts(config);
+
+    let gen_incs = gen_fe_includes();
+    println!("gen_incs: {}", gen_incs);
+
+    rmf_file("fe-core/fe-headers/fe-includes.h");
+    write_to_file("fe-core/fe-headers/fe-includes.h", &gen_incs);
     build_code();
     println!("done!");
 }
