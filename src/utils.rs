@@ -136,6 +136,12 @@ pub fn ch_dir(path: &str) {
     env::set_current_dir(path).expect("ERROR: Can't set current dir.");
 }
 
+pub fn run_core() {
+    ch_dir("fe-core/build");
+    run_cmd(&vec!["./main"]);
+    ch_dir("../..");
+}
+
 #[allow(unused_variables)]
 pub fn gen_fe_includes() -> String {
     let mut headers_vector: Vec<String> = Vec::new();
