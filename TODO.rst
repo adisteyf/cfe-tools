@@ -10,6 +10,11 @@ Structure of versions -- v1.2.3
 Check - ✅
 None - ⬜️
 
+v1.6.4
+------
+
+- ⬜️ Add **export-scripts** command *(from core)*
+
 v1.6.3
 ------
 
