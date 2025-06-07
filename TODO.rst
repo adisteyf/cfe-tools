@@ -14,6 +14,6 @@ v1.6.1
 - ✅ Make code *some cleaner*
 - ✅ Minimize the configuration
 - ✅ Add the possibility to create **scripts** in **path folder**
-- ⬜️ Add **fe-includes.h & fe-settings.h** generators
+- ✅ Add **fe-includes.h** generator
 - ✅ Fix **CMake** bug *(unplanned)*
 

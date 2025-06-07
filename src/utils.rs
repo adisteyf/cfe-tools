@@ -31,7 +31,7 @@ pub fn run_cmd(cmd: &[&str]) -> Child {
     return output;
 }
 
-fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+pub fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
     fs::create_dir_all(&dst)?;
     for entry in fs::read_dir(src)? {
         let entry = entry?;
@@ -75,16 +75,6 @@ pub fn cp_scripts(config: Config) {
 
         copy_dir_all(&folder, &format!("fe-core/{}", &folder)).unwrap();
     }
-
-    /*
-        println!("copying new fe-core scripts...");
-        println!(
-            "cfe folders: {}, curr. dir {:#?}",
-            folders_list.as_str(),
-            env::current_dir().unwrap()
-        );
-        //let _cp_new_scripts = run_cmd(&vec!["cp", "-r", folders_list.as_str(), "fe-core"]);
-    */
 }
 
 pub fn rm_scripts() {
@@ -127,4 +117,49 @@ pub fn mk_dir(folder: &str) {
 
 pub fn ch_dir(path: &str) {
     env::set_current_dir(path).expect("ERROR: Can't set current dir.");
+}
+
+#[allow(unused_variables)]
+pub fn gen_fe_includes() -> String {
+    let mut headers_vector: Vec<String> = Vec::new();
+
+    for root_entry in fs::read_dir(".").unwrap() {
+        let root_entry = root_entry.unwrap();
+
+        if !root_entry.path().is_dir()
+            || !root_entry
+                .file_name()
+                .to_string_lossy()
+                .into_owned()
+                .starts_with("cfe-")
+        {
+            continue;
+        }
+
+        let root_entry_path = root_entry.path().to_string_lossy().into_owned();
+        let incs_path = format!("{}/include", root_entry_path);
+        let incs = Path::new(&incs_path);
+
+        for entry in fs::read_dir(incs).unwrap() {
+            let entry = entry.unwrap();
+
+            if entry.path().is_dir() {
+                continue;
+            }
+
+            headers_vector.push(format!(
+                "{}",
+                entry.file_name().to_string_lossy().into_owned()
+            ));
+        }
+    }
+
+    let mut gen_str = String::from("#ifndef FE_INCLUDES__\n");
+    for header in headers_vector {
+        let curr_str = format!("#define FE_INCLUDES__\n#include \"{}\"\n", header);
+        gen_str.push_str(&curr_str);
+    }
+
+    gen_str.push_str("#endif");
+    gen_str
 }
