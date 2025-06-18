@@ -33,7 +33,9 @@ FeTestApp::FeTestApp(void)
     Model * model  = new Model("assets/models/vec3arr/scene.gltf");
     Model * model1 = new Model("assets/models/sword/scene.gltf");
     model->shType = 0;
+    model->enablePicking = true;
 
+    std::cout << "vec3arr meshes: " << model->meshes.size() << std::endl;
     glfwSetWindowUserPointer(window->getWindow(), camera);
     setupImGui(window->getWindow());
 
@@ -103,7 +105,6 @@ void FeTestApp::input_callback(Window * window, Camera &cam)
     if (!cam.showImGui) {
         if (window->windowGetKey(GLFW_KEY_W, GLFW_PRESS)) {
             cam.pos += cam.speed * cam.orientation;
-            printf("campos changed (%f)\n", cam.pos.x);
         }
         if (window->windowGetKey(GLFW_KEY_A, GLFW_PRESS)) {
             cam.pos -= cam.speed * glm::normalize(glm::cross(cam.orientation, cam.up));
@@ -163,9 +164,11 @@ void FeTestApp::input_callback(Window * window, Camera &cam)
 
             cam.orientation = glm::rotate(cam.orientation, glm::radians(-rotY), cam.up);
 
+            #ifdef FE_LOG_LEVEL_INFO
             std::cout << cam.orientation.x << std::endl;
             std::cout << cam.orientation.y << std::endl;
             std::cout << cam.orientation.z << std::endl;
+            #endif
             window->setCursorPos(center.x, center.y);
         }
 
