@@ -33,8 +33,12 @@ FeTestApp::FeTestApp(void)
     Model * model  = new Model("assets/models/vec3arr/scene.gltf");
     Model * model1 = new Model("assets/models/sword/scene.gltf");
     model->shType = 0;
-    model->enablePicking = true;
+    model->enablePicking = 0;
 
+    model->meshes[0].enablePicking = 1;
+
+    std::cout << "sword: " << model1->getId() << std::endl;
+    std::cout << "vec3arr: " << model->getId() << std::endl;
     std::cout << "vec3arr meshes: " << model->meshes.size() << std::endl;
     glfwSetWindowUserPointer(window->getWindow(), camera);
     setupImGui(window->getWindow());
