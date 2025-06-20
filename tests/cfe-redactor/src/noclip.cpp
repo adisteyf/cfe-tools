@@ -14,11 +14,13 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
+#include <bits/c++config.h>
 #include <cmath>
 #include <ostream>
 
 extern Camera * mainCamera;
 extern Shader * modelDrawShader;
+char inputbuf[128];
 
 FeTestApp::FeTestApp(void)
     : input(fe_getInput()), 
@@ -45,6 +47,41 @@ FeTestApp::FeTestApp(void)
 
     addModel(model);
     addModel(model1);
+
+    ImGuiStyle &style = ImGui::GetStyle();
+    style.WindowPadding = ImVec2(4, 4);
+    style.ItemSpacing = ImVec2(8, 4);
+    style.ItemInnerSpacing = ImVec2(5, 4);
+    style.ScrollbarSize = 15;
+    style.GrabMinSize = 15;
+    style.WindowBorderSize = 0;
+    style.ChildBorderSize = 0;
+    style.TabBarBorderSize = 0;
+    style.WindowRounding = 5;
+    style.FrameRounding = 6;
+    style.FramePadding = ImVec2(6, 6);
+    style.ScrollbarRounding = 12;
+    style.GrabRounding = 4;
+    style.TableAngledHeadersTextAlign = ImVec2(0.5, 0.5);
+    style.WindowMenuButtonPosition = ImGuiDir_Right;
+    style.ColorButtonPosition = ImGuiDir_Left;
+    style.SeparatorTextBorderSize = 1;
+    style.SeparatorTextAlign = ImVec2(0.5, 0.5);
+    style.WindowTitleAlign = ImVec2(0.5, 0.5);
+    style.SeparatorTextPadding = ImVec2(0.0, 0.0);
+
+    style.Colors[ImGuiCol_TitleBgActive] = ImColor{IM_COL32(112, 19, 208, 255)};
+    style.Colors[ImGuiCol_TitleBg] = ImColor{IM_COL32(23, 11, 36, 255)};
+    style.Colors[ImGuiCol_WindowBg] = ImColor{IM_COL32(0, 0, 0, 255)};
+    style.Colors[ImGuiCol_FrameBgHovered] = ImColor{IM_COL32(177, 98, 255, 100)};
+    style.Colors[ImGuiCol_FrameBg] = ImColor{IM_COL32(81, 41, 122, 95)};
+    style.Colors[ImGuiCol_CheckMark] = ImColor{IM_COL32(125, 0, 255, 255)};
+    style.Colors[ImGuiCol_SliderGrab] = ImColor{IM_COL32(151, 0, 255, 255)};
+    style.Colors[ImGuiCol_Button] = ImColor{IM_COL32(106, 46, 255, 130)};
+    style.Colors[ImGuiCol_Header] = ImColor{IM_COL32(88, 28, 170, 150)};
+    style.Colors[ImGuiCol_Tab] = ImColor{IM_COL32(92, 66, 167, 220)};
+    style.Colors[ImGuiCol_TabSelected] = ImColor{IM_COL32(182, 128, 255, 255)};
+    style.Colors[ImGuiCol_TabHovered] = ImColor{IM_COL32(177, 150, 255, 255)};
 }
 
 void FeTestApp::cycle(void)
@@ -89,6 +126,36 @@ void FeTestApp::cycle(void)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        /*
+        ImGuiStyle &style = ImGui::GetStyle();
+        style.WindowPadding = ImVec2(4, 4);
+        style.ItemSpacing = ImVec2(8, 4);
+        style.ItemInnerSpacing = ImVec2(5, 4);
+        style.ScrollbarSize = 15;
+        style.GrabMinSize = 15;
+        style.WindowBorderSize = 0;
+        style.ChildBorderSize = 0;
+        style.TabBarBorderSize = 0;
+        style.WindowRounding = 5;
+        style.FrameRounding = 6;
+        style.ScrollbarRounding = 12;
+        style.GrabRounding = 4;
+        style.TableAngledHeadersTextAlign = ImVec2(0.5, 0.5);
+        style.WindowMenuButtonPosition = ImGuiDir_Right;
+        style.ColorButtonPosition = ImGuiDir_Left;
+        style.SeparatorTextBorderSize = 1;
+        style.SeparatorTextAlign = ImVec2(0.5, 0.5);
+        style.WindowTitleAlign = ImVec2(0.5, 0.5);
+        style.SeparatorTextPadding = ImVec2(0.0, 0.0);
+
+        style.Colors[ImGuiCol_TitleBgActive] = ImColor{IM_COL32(112, 19, 208, 255)};
+        style.Colors[ImGuiCol_TitleBg] = ImColor{IM_COL32(12, 0, 25, 255)};
+        style.Colors[ImGuiCol_TitleBg] = ImColor{IM_COL32(44, 22, 66, 138)};
+        style.Colors[ImGuiCol_WindowBg] = ImColor{IM_COL32(0, 0, 0, 255)};
+        style.Colors[ImGuiCol_FrameBgHovered] = ImColor{IM_COL32(217, 179, 255, 200)};
+        style.Colors[ImGuiCol_FrameBg] = ImColor{IM_COL32(81, 41, 122, 95)};
+        */
+        ImGuiStyle &style = ImGui::GetStyle();
 
         ImGui::ShowDemoWindow();
 
@@ -96,6 +163,26 @@ void FeTestApp::cycle(void)
             ImGui::SliderFloat("Speed", &camera->speed, 0.001, 0.5);
         ImGui::End();
 
+        ImGui::Begin("Console");
+            ImVec4 origFrameBg = style.Colors[ImGuiCol_FrameBg];
+            ImVec4 origFrameBgActive = style.Colors[ImGuiCol_FrameBgActive];
+
+            style.Colors[ImGuiCol_FrameBg] = ImVec4(0, 0, 0, 0);
+            style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0, 0, 0, 0);
+
+            const float footer_height = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+            ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar);
+                char testtxt[] = "Test text for tests with console prototype";
+                ImGui::InputTextMultiline("##termtxt", testtxt, IM_ARRAYSIZE(testtxt), ImVec2(-1, -1), ImGuiInputTextFlags_ReadOnly);
+            ImGui::EndChild();
+
+            ImGui::Separator();
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputTextWithHint("##input", "enter command", inputbuf, IM_ARRAYSIZE(inputbuf), 0);
+
+            style.Colors[ImGuiCol_FrameBg] = origFrameBg;
+            style.Colors[ImGuiCol_FrameBgActive] = origFrameBgActive;
+        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
