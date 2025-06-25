@@ -17,10 +17,13 @@
 #include <bits/c++config.h>
 #include <cmath>
 #include <ostream>
+#include <cstring>
+#include "console.h"
 
 extern Camera * mainCamera;
 extern Shader * modelDrawShader;
 char inputbuf[128];
+Console * cnsl = 0;
 
 FeTestApp::FeTestApp(void)
     : input(fe_getInput()), 
@@ -30,6 +33,7 @@ FeTestApp::FeTestApp(void)
       txtRenderer(new TextRenderer(*txtShader, "assets/fonts/ProggyCleanRu.ttf", 40)),
       window(fe_getWindow())
 {
+    cnsl = new Console();
     camera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, glm::vec3(-2.f, 8.f, 4.f), 45.0f, 0.1f, 100.0f);
     mainCamera = camera;
     Model * model  = new Model("assets/models/vec3arr/scene.gltf");
@@ -82,6 +86,11 @@ FeTestApp::FeTestApp(void)
     style.Colors[ImGuiCol_Tab] = ImColor{IM_COL32(92, 66, 167, 220)};
     style.Colors[ImGuiCol_TabSelected] = ImColor{IM_COL32(182, 128, 255, 255)};
     style.Colors[ImGuiCol_TabHovered] = ImColor{IM_COL32(177, 150, 255, 255)};
+
+    ImGuiIO &io = ImGui::GetIO(); (void)io;
+    //io.Fonts->AddFontDefault();
+    ImFont *mainft = io.Fonts->AddFontFromFileTTF("assets/fonts/JetBrainsMonoNerdFontPropo-Medium.ttf", 21.f, 0, io.Fonts->GetGlyphRangesCyrillic());
+    //IM_ASSERT(!mainft);
 }
 
 void FeTestApp::cycle(void)
@@ -97,12 +106,12 @@ void FeTestApp::cycle(void)
 
     if (window->windowGetKey(GLFW_KEY_F, GLFW_PRESS)) {
         Model * model = getModel(0);
-        model->changePos(glm::vec3(1.0f, 1.f, 1.f));
+        model->pos.x += 0.1f;
     }
 
     if (window->windowGetKey(GLFW_KEY_G, GLFW_PRESS)) {
         Model * model = getModel(0);
-        model->changePos(glm::vec3(0.f,0.f,0.f));
+        model->pos.x -= 0.1f;
     }
 
 
@@ -126,35 +135,6 @@ void FeTestApp::cycle(void)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        /*
-        ImGuiStyle &style = ImGui::GetStyle();
-        style.WindowPadding = ImVec2(4, 4);
-        style.ItemSpacing = ImVec2(8, 4);
-        style.ItemInnerSpacing = ImVec2(5, 4);
-        style.ScrollbarSize = 15;
-        style.GrabMinSize = 15;
-        style.WindowBorderSize = 0;
-        style.ChildBorderSize = 0;
-        style.TabBarBorderSize = 0;
-        style.WindowRounding = 5;
-        style.FrameRounding = 6;
-        style.ScrollbarRounding = 12;
-        style.GrabRounding = 4;
-        style.TableAngledHeadersTextAlign = ImVec2(0.5, 0.5);
-        style.WindowMenuButtonPosition = ImGuiDir_Right;
-        style.ColorButtonPosition = ImGuiDir_Left;
-        style.SeparatorTextBorderSize = 1;
-        style.SeparatorTextAlign = ImVec2(0.5, 0.5);
-        style.WindowTitleAlign = ImVec2(0.5, 0.5);
-        style.SeparatorTextPadding = ImVec2(0.0, 0.0);
-
-        style.Colors[ImGuiCol_TitleBgActive] = ImColor{IM_COL32(112, 19, 208, 255)};
-        style.Colors[ImGuiCol_TitleBg] = ImColor{IM_COL32(12, 0, 25, 255)};
-        style.Colors[ImGuiCol_TitleBg] = ImColor{IM_COL32(44, 22, 66, 138)};
-        style.Colors[ImGuiCol_WindowBg] = ImColor{IM_COL32(0, 0, 0, 255)};
-        style.Colors[ImGuiCol_FrameBgHovered] = ImColor{IM_COL32(217, 179, 255, 200)};
-        style.Colors[ImGuiCol_FrameBg] = ImColor{IM_COL32(81, 41, 122, 95)};
-        */
         ImGuiStyle &style = ImGui::GetStyle();
 
         ImGui::ShowDemoWindow();
@@ -172,13 +152,15 @@ void FeTestApp::cycle(void)
 
             const float footer_height = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
             ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar);
-                char testtxt[] = "Test text for tests with console prototype";
-                ImGui::InputTextMultiline("##termtxt", testtxt, IM_ARRAYSIZE(testtxt), ImVec2(-1, -1), ImGuiInputTextFlags_ReadOnly);
+                std::string output = cnsl->oss.str();
+                ImGui::InputTextMultiline("##termtxt", const_cast<char *>(output.c_str()), output.size(), ImVec2(-1, -1), ImGuiInputTextFlags_ReadOnly);
             ImGui::EndChild();
 
             ImGui::Separator();
             ImGui::SetNextItemWidth(-1);
             ImGui::InputTextWithHint("##input", "enter command", inputbuf, IM_ARRAYSIZE(inputbuf), 0);
+            std::string inputbufstr(inputbuf);
+            cnsl->input(inputbufstr);
 
             style.Colors[ImGuiCol_FrameBg] = origFrameBg;
             style.Colors[ImGuiCol_FrameBgActive] = origFrameBgActive;
@@ -275,4 +257,5 @@ void FeTestApp::free(void)
     delete txtShader;
     delete txtRenderer;
     delete camera;
+    delete cnsl;
 }
