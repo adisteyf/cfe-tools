@@ -137,6 +137,11 @@ pub fn ch_dir(path: &str) {
 }
 
 pub fn run_core() {
+    if fs::metadata("fe-core/build").is_err() {
+        println!("ERROR: No build folder.");
+        return;
+    }
+
     ch_dir("fe-core/build");
     run_cmd(&vec!["./main"]);
     ch_dir("../..");

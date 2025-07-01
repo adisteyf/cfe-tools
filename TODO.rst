@@ -14,6 +14,7 @@ v1.6.4
 ------
 
 - ✅ Add **export-scripts** command *(from core)*
+- ✅ Fix bug with **run-core** when **build** is absent
 
 v1.6.3
 ------
