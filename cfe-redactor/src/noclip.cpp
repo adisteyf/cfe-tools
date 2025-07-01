@@ -262,9 +262,6 @@ void FeTestApp::input_callback(Window * window, Camera &cam)
 
 void FeTestApp::free(void)
 {
-		cnsl->work = false;
-		//cnsl->t.join();
-
     delete txtShader;
     delete txtRenderer;
     delete camera;
