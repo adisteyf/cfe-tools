@@ -11,6 +11,7 @@
 
 /* ImGui */
 #include "imgui.h"
+#include "imgui_stdlib.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
@@ -22,7 +23,7 @@
 
 extern Camera * mainCamera;
 extern Shader * modelDrawShader;
-char inputbuf[128];
+std::string inputbufstr;
 Console * cnsl = 0;
 
 FeTestApp::FeTestApp(void)
@@ -34,6 +35,8 @@ FeTestApp::FeTestApp(void)
       window(fe_getWindow())
 {
     cnsl = new Console();
+		//cnsl_in = std::thread(cnsl->process_input);
+
     camera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, glm::vec3(-2.f, 8.f, 4.f), 45.0f, 0.1f, 100.0f);
     mainCamera = camera;
     Model * model  = new Model("assets/models/vec3arr/scene.gltf");
@@ -88,6 +91,7 @@ FeTestApp::FeTestApp(void)
     style.Colors[ImGuiCol_TabHovered] = ImColor{IM_COL32(177, 150, 255, 255)};
 
     ImGuiIO &io = ImGui::GetIO(); (void)io;
+
     //io.Fonts->AddFontDefault();
     ImFont *mainft = io.Fonts->AddFontFromFileTTF("assets/fonts/JetBrainsMonoNerdFontPropo-Medium.ttf", 21.f, 0, io.Fonts->GetGlyphRangesCyrillic());
     //IM_ASSERT(!mainft);
@@ -158,10 +162,14 @@ void FeTestApp::cycle(void)
 
             ImGui::Separator();
             ImGui::SetNextItemWidth(-1);
-            ImGui::InputTextWithHint("##input", "enter command", inputbuf, IM_ARRAYSIZE(inputbuf), 0);
-            std::string inputbufstr(inputbuf);
-            cnsl->input(inputbufstr);
 
+            ImGui::InputTextWithHint("##input", "enter command", &inputbufstr);
+
+						if (!inputbufstr.empty() && ImGui::IsItemHovered() && window->windowGetKey(GLFW_KEY_ENTER, GLFW_PRESS)) {
+							cnsl->input(inputbufstr);
+							inputbufstr.clear();
+						}
+						
             style.Colors[ImGuiCol_FrameBg] = origFrameBg;
             style.Colors[ImGuiCol_FrameBgActive] = origFrameBgActive;
         ImGui::End();
@@ -254,6 +262,9 @@ void FeTestApp::input_callback(Window * window, Camera &cam)
 
 void FeTestApp::free(void)
 {
+		cnsl->work = false;
+		//cnsl->t.join();
+
     delete txtShader;
     delete txtRenderer;
     delete camera;
